@@ -22,10 +22,10 @@
     "noUncheckedSideEffectImports": true,
 
 
-    //配置@
-    "baseUrl": ". ",
-    "path": {
-      "@/*":["src/*"]
+    //配置 @
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
     }
   },
   "include": ["vite.config.ts"]
