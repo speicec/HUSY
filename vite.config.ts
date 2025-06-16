@@ -1,24 +1,29 @@
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
 
-import path from 'path'
+import path from 'path';
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [vue()],
+  server: {
+    host: '0.0.0.0', // 监听所有网络接口
+    port: 5170, // 指定端口号
+    open: true // 启动后自动打开浏览器
+  },
 
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
+      '@': path.resolve(__dirname, './src')
+    }
   },
-  //CSS配置
-  css:{
+  // CSS配置
+  css: {
     preprocessorOptions: {
-      scss:{
+      scss: {
          // additionalData:`@import "@/styles/reset.scss";`
       }
     }
   }
-})
+});
 
