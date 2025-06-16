@@ -1,65 +1,63 @@
 module.exports = {
-    types: [
-        {
-            value: ':sparkles: feat',
-            name: '✨ feat:     新功能'
+
+        messages: {
+            type: '请选择提交类型:',
+            customScope: '请输入您修改的范围(可选):',
+            subject: '请简要描述提交 message (必填):',
+            body: '请输入详细描述(可选，待优化去除，跳过即可):',
+            footer: '请输入要关闭的issue(待优化去除，跳过即可):',
+            confirmCommit: '确认使用以上信息提交？(y/n/e/h)'
         },
-        {
-            value: ':bug: fix',
-            name: '🐛 fix:      修复bug'
-        },
-        {
-            value: ':package: build',
-            name: '📦️ build:    打包'
-        },
-        {
-            value: ':zap: perf',
-            name: '⚡️ perf:     性能优化'
-        },
-        {
-            value: ':tada: release',
-            name: '🎉 release:  发布正式版'
-        },
-        {
-            value: ':lipstick: style',
-            name: '💄 style:    代码的样式美化'
-        },
-        {
-            value: ':recycle: refactor',
-            name: '♻️  refactor: 重构'
-        },
-        {
-            value: ':pencil2: docs',
-            name: '✏️  docs:     文档变更'
-        },
-        {
-            value: ':white_check_mark: test',
-            name: '✅ test:     测试'
-        },
-        {
-            value: ':rewind: revert',
-            name: '⏪️ revert:   回退'
-        },
-        {
-            value: ':rocket: chore',
-            name: '🚀 chore:    构建/工程依赖/工具'
-        },
-        {
-            value: ':construction_worker: ci',
-            name: '👷 ci:       CI related changes'
-        }
-    ],
-    messages: {
-        type: '请选择提交类型(必填)',
-        customScope: '请输入文件修改范围(可选)',
-        subject: '请简要描述提交(必填)',
-        body: '请输入详细描述(可选)',
-        breaking: '列出任何BREAKING CHANGES(可选)',
-        footer: '请输入要关闭的issue(可选)',
-        confirmCommit: '确定提交此说明吗？'
-    },
-    allowCustomScopes: true,
-    // 跳过问题
-    skipQuestions: ['body', 'footer'],
-    subjectLimit: 72
-}
+        types: [
+            { value: 'feat', name: 'feat: 增加新功能' },
+            { value: 'wip', name: 'wip: 开发中' },
+            { value: 'types', name: 'types: 类型定义文件更改' },
+            { value: 'bug', name: 'bug: 测试反馈bug列表中的bug号' },
+            { value: 'fix', name: 'fix: 修复bug' },
+            { value: 'style', name: 'style: 代码格式(不影响代码运行的变动)' },
+            { value: 'perf', name: 'perf: 优化/性能提升' },
+            { value: 'refactor', name: 'refactor: 重构(既不是增加feature，也不是修复bug)' },
+            { value: 'test', name: 'test: 增加测试' },
+            { value: 'ui', name: 'ui: 更新UI' },
+            { value: 'docs', name: 'docs: 文档变更/注释' },
+            { value: 'merge', name: 'revert: 合并分支' },
+            { value: 'revert', name: 'revert: 撤销修改' },
+            { value: 'chore', name: 'chore: 依赖更新/脚手架配置修改等' },
+            { value: 'workflow', name: 'workflow: 工作流改进' },
+            { value: 'build', name: 'build: 打包' },
+            { value: 'release', name: 'release: 发布' },
+            { value: 'deploy', name: 'deploy: 部署' },
+            { value: 'ci', name: 'ci: 持续集成' }
+        ],
+        useEmoji: true,
+        themeColorCode: '',
+        scopes: [],
+        allowCustomScopes: true,
+        allowEmptyScopes: true,
+        customScopesAlign: 'bottom',
+        customScopesAlias: 'custom',
+        emptyScopesAlias: 'empty',
+        upperCaseSubject: false,
+        allowBreakingChanges: ['feat', 'fix'],
+        breaklineNumber: 100,
+        breaklineChar: '|',
+        skipQuestions: [],
+        issuePrefixs: [
+            { value: 'closed', name: 'closed:   ISSUES has been processed' }
+        ],
+        customIssuePrefixsAlign: 'top',
+        emptyIssuePrefixsAlias: 'skip',
+        customIssuePrefixsAlias: 'custom',
+        allowCustomIssuePrefixs: true,
+        allowEmptyIssuePrefixs: true,
+        confirmColorize: true,
+        maxHeaderLength: Infinity,
+        maxSubjectLength: Infinity,
+        minSubjectLength: 0,
+        scopeOverrides: undefined,
+        defaultBody: '',
+        defaultIssues: '',
+        defaultScope: '',
+        defaultSubject: ''
+
+};
