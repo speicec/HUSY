@@ -1,6 +1,6 @@
 <template>
   <div class="home-container">
-    <h1>这是 home 页面</h1>
+    <h1>这是页面 home </h1>
     <div>
 
       <router-link to="/permissions">点我去permissions</router-link>
