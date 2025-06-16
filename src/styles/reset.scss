@@ -2,12 +2,25 @@
 *:after,
 *:before {
   box-sizing: border-box;
-
   outline: none;
 }
 
 html,
-body,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  line-height: 1;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
 div,
 span,
 applet,
@@ -110,10 +123,6 @@ menu,
 nav,
 section {
   display: block;
-}
-
-body {
-  line-height: 1;
 }
 
 ol,
