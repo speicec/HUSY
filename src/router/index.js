@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Home from '@/views/home/index.vue';
 import Permissions from '@/views/permissions/index.vue';
+import Table from '@/views/alia-menu/table1.vue';
 
 const routes = [
     {
@@ -12,6 +13,11 @@ const routes = [
         path: '/Permissions',
         name: 'Permissions',
         component: Permissions
+    },
+    {
+        path: '/Table',
+        name: 'Table',
+        component: Table
     }
 ];
 
