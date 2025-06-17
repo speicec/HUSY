@@ -9,9 +9,9 @@
 
         <!-- 右侧 -->
         <div class="flex items-center space-x-2">
-          <el-input 
-            v-model="searchQuery" 
-            placeholder="搜索角色信息" 
+          <el-input
+            v-model="searchQuery"
+            placeholder="搜索角色信息"
             style="margin-right: 12px"
             @input="handleSearch"
           ><el-icon>block</el-icon></el-input>
@@ -21,9 +21,9 @@
       </el-header>
 
       <el-main>
-        <el-table 
-          :data="filteredTableData" 
-          style="width: 100%" 
+        <el-table
+          :data="filteredTableData"
+          style="width: 100%"
           stripe
           @selection-change="handleSelectionChange"
         >
@@ -46,15 +46,15 @@
               </el-tag>
             </template>
           </el-table-column>
-<!--          <el-table-column prop="status" label="状态" width="100">-->
-<!--            <template #default="{ row }">-->
-<!--              <el-tag :type="row.status === 'active' ? 'success' : 'info'">-->
-<!--                {{ row.status === 'active' ? '启用' : '禁用' }}-->
-<!--              </el-tag>-->
-<!--            </template>-->
-<!--          </el-table-column>-->
-<!--          <el-table-column prop="createTime" label="创建时间" width="180" />-->
-<!--          <el-table-column prop="updateTime" label="更新时间" width="180" />-->
+          <!--          <el-table-column prop="status" label="状态" width="100">-->
+          <!--            <template #default="{ row }">-->
+          <!--              <el-tag :type="row.status === 'active' ? 'success' : 'info'">-->
+          <!--                {{ row.status === 'active' ? '启用' : '禁用' }}-->
+          <!--              </el-tag>-->
+          <!--            </template>-->
+          <!--          </el-table-column>-->
+          <!--          <el-table-column prop="createTime" label="创建时间" width="180" />-->
+          <!--          <el-table-column prop="updateTime" label="更新时间" width="180" />-->
 
           <el-table-column fixed="right" label="操作" min-width="120" style="text-align: left">
             <template #default="{ row }">
@@ -67,10 +67,10 @@
         </el-table>
       </el-main>
 
-      <el-dialog 
-        v-model="dialogFormVisible" 
-        :title="isEdit ? '编辑医生端角色' : '添加医生端角色'"  
-        width="1000" 
+      <el-dialog
+        v-model="dialogFormVisible"
+        :title="isEdit ? '编辑医生端角色' : '添加医生端角色'"
+        width="1000"
         style="text-align: center;"
       >
         <el-form :model="permissionForm" :rules="rules" ref="formRef">
@@ -125,6 +125,7 @@
           <el-pagination
             v-model:current-page="currentPage"
             v-model:page-size="pageSize"
+            :pager-count="10"
             :page-sizes="[10, 20, 50, 100]"
             :background="true"
             layout="total, sizes, prev, pager, next, jumper"
@@ -203,7 +204,7 @@ const handleSearch = () => {
   if (!searchQuery.value) {
     tableData.value = [...mockPermissions];
   } else {
-    tableData.value = mockPermissions.filter(item => 
+    tableData.value = mockPermissions.filter(item =>
       item.roleName.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
       item.permissions.some(p => getPermissionLabel(p).toLowerCase().includes(searchQuery.value.toLowerCase()))
     );
@@ -262,7 +263,7 @@ const handleDelete = (row: Permission) => {
     {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
-      type: 'warning',
+      type: 'warning'
     }
   ).then(() => {
     const index = tableData.value.findIndex(item => item.id === row.id);
@@ -277,14 +278,14 @@ const handleDelete = (row: Permission) => {
 // 批量删除
 const handleBatchDelete = () => {
   if (selectedRows.value.length === 0) return;
-  
+
   ElMessageBox.confirm(
     `确定要删除选中的 ${selectedRows.value.length} 个角色吗？`,
     '警告',
     {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
-      type: 'warning',
+      type: 'warning'
     }
   ).then(() => {
     const ids = selectedRows.value.map(row => row.id);
@@ -309,7 +310,7 @@ const resetPermissionTree = () => {
 const updatePermissionTree = (permissions: string[]) => {
   permissionTree.value.forEach(group => {
     if (group.children) {
-      const childrenChecked = group.children.filter(child => 
+      const childrenChecked = group.children.filter(child =>
         permissions.includes(child.value)
       );
       group.checked = childrenChecked.length === group.children.length;
@@ -335,14 +336,14 @@ const handleGroupChange = (val: boolean, group: any) => {
   if (val) {
     permissionForm.value.noPermission = false;
   }
-  
+
   if (group.children) {
     group.children.forEach((child: any) => {
       child.checked = val;
     });
     group.indeterminate = false;
   }
-  
+
   updateCheckedPermissions();
 };
 
@@ -351,13 +352,13 @@ const handleChildChange = (val: boolean, child: any, group: any) => {
   if (val) {
     permissionForm.value.noPermission = false;
   }
-  
+
   if (group.children) {
     const checkedCount = group.children.filter((c: any) => c.checked).length;
     group.checked = checkedCount === group.children.length;
     group.indeterminate = checkedCount > 0 && checkedCount < group.children.length;
   }
-  
+
   updateCheckedPermissions();
 };
 
@@ -378,14 +379,14 @@ const updateCheckedPermissions = () => {
 };
 
 // 提交表单
-const submitForm = async () => {
+const submitForm = async() => {
   if (!formRef.value) return;
-  
+
   await formRef.value.validate((valid) => {
     if (valid) {
       const now = new Date().toISOString();
       const permissions = permissionForm.value.noPermission ? [] : permissionForm.value.checkedPermissions;
-      
+
       if (isEdit.value) {
         // 编辑现有角色
         const index = tableData.value.findIndex(item => item.id === permissionForm.value.id);
@@ -412,7 +413,7 @@ const submitForm = async () => {
         total.value = tableData.value.length;
         ElMessage.success('添加成功');
       }
-      
+
       dialogFormVisible.value = false;
     }
   });
@@ -577,7 +578,7 @@ const handleCurrentChange = (val: number) => {
 .permission-header {
   margin-bottom: 5px;
   text-align: left;
-  
+
   :deep(.el-checkbox) {
     margin-left: 0;
     font-weight: bold;
@@ -586,12 +587,12 @@ const handleCurrentChange = (val: number) => {
 
 .permission-checkbox-group {
   margin-top: 0;
-  
+
   .permission-group {
     display: flex;
     align-items: center;
     margin-bottom: 12px;
-    
+
     .children-group {
       display: flex;
       flex-wrap: wrap;

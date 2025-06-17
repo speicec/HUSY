@@ -58,19 +58,19 @@ export const permissionGroups = [
 // Generate mock data
 const generateMockData = (): Permission[] => {
   const data: Permission[] = [];
-  const roles = ['主治医师', '住院医师', '主任', '副主任', '实习医师','访客'];
+  const roles = ['主治医师', '住院医师', '主任', '副主任', '实习医师', '访客'];
   const statuses: ('active' | 'inactive')[] = ['active', 'inactive'];
-  
+
   for (let i = 1; i <= 50; i++) {
     const roleType = roles[Math.floor(Math.random() * roles.length)];
     const permissions = permissionGroups
       .flatMap(group => group.children || [group])
       .filter(() => Math.random() > 0.3)
       .map(p => p.value);
-    
+
     const createTime = new Date(Date.now() - Math.random() * 10000000000).toISOString();
     const updateTime = new Date(Date.now() - Math.random() * 1000000000).toISOString();
-    
+
     data.push({
       id: i,
       roleName: `${roleType}${i}`,
@@ -80,8 +80,8 @@ const generateMockData = (): Permission[] => {
       status: statuses[Math.floor(Math.random() * statuses.length)]
     });
   }
-  
+
   return data;
 };
 
-export const mockPermissions = generateMockData(); 
+export const mockPermissions = generateMockData();
