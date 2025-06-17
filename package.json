@@ -10,7 +10,15 @@
     "prepare": "husky install",
     "commit": "git add . && cz-customizable",
     "type-check": "vue-tsc --noEmit --skipLibCheck",
-    "test": "echo \"No tests yet\" && exit 0"
+    "test": "echo \"No tests yet\" && exit 0",
+    "lint": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js}": [
+      "eslint --fix",
+      "prettier --write",
+      "git add"
+    ]
   },
   "dependencies": {
     "@types/node": "^24.0.1",
@@ -58,13 +66,6 @@
       "hooks": {
         "pre-commit": "lint-staged"
       }
-    },
-    "lint-staged": {
-      "*.{ts,tsx,js}": [
-        "eslint --fix",
-        "prettier --write",
-        "git add"
-      ]
     }
   }
 }
