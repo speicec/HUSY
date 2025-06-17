@@ -5,7 +5,15 @@ import router from './router';
 import ElementPlus from 'element-plus';
 import 'element-plus/dist/index.css';
 
-
-import '@/styles/reset.scss'
 import '@/styles/index.scss';
-createApp(App).use(ElementPlus).use(router).mount('#app');
+
+// 自定义主题色
+const app = createApp(App);
+app.use(ElementPlus, {
+  theme: {
+    primary: '#11d2c8',
+    success: '#409EFF',
+  }
+});
+app.use(router);
+app.mount('#app');
