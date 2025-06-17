@@ -37,36 +37,44 @@
         </el-table>
       </el-main>
 
-      <el-dialog v-model="dialogFormVisible" title="角色编辑" width="500">
+      <el-dialog v-model="dialogFormVisible" title="角色编辑" width="1000" style="text-align: center">
         <el-form :model="permissionForm">
           <!-- 第一行 -->
-          <el-form-item label="医生端角色名称" :label-width="formLabelWidth">
+          <el-form-item label="医生端角色名称" :label-width="formLabelWidth" required>
             <el-input v-model="permissionForm.roleName" autocomplete="off" />
           </el-form-item>
 
           <!-- 第二行 -->
-          <el-form-item label="医生端权限" :label-width="formLabelWidth" required>
-            <el-checkbox
-              v-model="permissionForm.noPermission"
-              @change="handleNoPermissionChange"
-            >无医生端权限</el-checkbox>
+          <el-form-item label="医生端权限" :label-width="formLabelWidth" required class="permission-form-item">
+            <div class="permission-header">
+              <el-checkbox
+                v-model="permissionForm.noPermission"
+                @change="handleNoPermissionChange"
+              >无医生端权限</el-checkbox>
+            </div>
 
-            <el-cascader
-              v-model="permissionForm.checkedPermissions"
-              :options="permissionTree"
-              :props="{
-                multiple: true,
-                checkStrictly: true,
-                emitPath: false,
-                value: 'value',
-                label: 'label',
-                children: 'children'
-              }"
-              collapse-tags
-              collapse-tags-tooltip
-              class="w-full"
-              placeholder="请选择权限"
-            />
+            <div class="permission-checkbox-group">
+              <div v-for="group in permissionTree" :key="group.value" class="permission-group">
+                <el-checkbox
+                  v-model="group.checked"
+                  :indeterminate="group.indeterminate"
+                  @change="(val) => handleGroupChange(val, group)"
+                  style="font-weight: bold;"
+                >
+                  {{ group.label }}
+                </el-checkbox>
+                <div class="children-group">
+                  <el-checkbox
+                    v-for="child in group.children"
+                    :key="child.value"
+                    v-model="child.checked"
+                    @change="(val) => handleChildChange(val, child, group)"
+                  >
+                    {{ child.label }}
+                  </el-checkbox>
+                </div>
+              </div>
+            </div>
           </el-form-item>
         </el-form>
         <template #footer>
@@ -114,6 +122,8 @@ interface Permission {
   label: string
   value: string
   children?: Permission[]
+  checked?: boolean
+  indeterminate?: boolean
 }
 
 const dialogFormVisible = ref(false);
@@ -125,59 +135,118 @@ const permissionForm = ref({
   checkedPermissions: [] as string[]
 });
 
-const permissionTree: Permission[] = [
+const permissionTree = ref<Permission[]>([
   {
     label: '总览',
     value: 'group-a',
+    checked: false,
+    indeterminate: false,
     children: [
-      { label: '查看患者详情', value: 'ckhzxq' },
-      { label: '术前访视', value: 'sqfs' },
-      { label: '预警申报', value: 'yjsb' }
+      { label: '查看患者详情', value: 'ckhzxq', checked: false },
+      { label: '术前访视', value: 'sqfs', checked: false },
+      { label: '预警申报', value: 'yjsb', checked: false }
     ]
   },
   {
     label: '排班',
     value: 'group-b',
+    checked: false,
+    indeterminate: false,
     children: [
-      { label: '查看个人排班', value: 'ckgrpb' },
-      { label: '查看全科排班', value: 'ckqkpb' }
+      { label: '查看个人排班', value: 'ckgrpb', checked: false },
+      { label: '查看全科排班', value: 'ckqkpb', checked: false }
     ]
   },
   {
     label: '访视',
     value: 'group-c',
+    checked: false,
+    indeterminate: false,
     children: [
-      { label: '查看个人访视', value: 'ckgrfs' },
-      { label: '查看全科访视', value: 'ckqkfs' }
+      { label: '查看个人访视', value: 'ckgrfs', checked: false },
+      { label: '查看全科访视', value: 'ckqkfs', checked: false }
     ]
   },
   {
     label: '预警',
     value: 'group-d',
+    checked: false,
+    indeterminate: false,
     children: [
-      { label: '查看报警详情', value: 'ckbjxq' },
-      { label: '处理报警', value: 'clbj' }
+      { label: '查看报警详情', value: 'ckbjxq', checked: false },
+      { label: '处理报警', value: 'clbj', checked: false }
     ]
   },
   {
     label: '工作量统计',
     value: 'group-e',
+    checked: false,
+    indeterminate: false,
     children: [
-      { label: '查看个人工作量', value: 'ckgrgzl' },
-      { label: '查看全科工作量', value: 'ckqkgzl' }
+      { label: '查看个人工作量', value: 'ckgrgzl', checked: false },
+      { label: '查看全科工作量', value: 'ckqkgzl', checked: false }
     ]
   },
   {
     label: '查看个人工作报告',
-    value: 'group-f'
-
+    value: 'group-f',
+    checked: false,
+    indeterminate: false
   }
-];
+]);
 
 function handleNoPermissionChange(val: boolean) {
   if (val) {
-    permissionForm.value.checkedPermissions = [];
+    permissionTree.value.forEach(group => {
+      group.checked = false;
+      group.indeterminate = false;
+      group.children?.forEach(child => {
+        child.checked = false;
+      });
+    });
+    updateCheckedPermissions();
   }
+}
+
+function handleGroupChange(val: boolean, group: Permission) {
+  if (val) {
+    permissionForm.value.noPermission = false;
+  }
+  
+  group.children?.forEach(child => {
+    child.checked = val;
+  });
+  group.indeterminate = false;
+  
+  updateCheckedPermissions();
+}
+
+function handleChildChange(val: boolean, child: Permission, group: Permission) {
+  if (val) {
+    permissionForm.value.noPermission = false;
+  }
+  
+  const children = group.children || [];
+  const checkedCount = children.filter(c => c.checked).length;
+  group.checked = checkedCount === children.length;
+  group.indeterminate = checkedCount > 0 && checkedCount < children.length;
+  
+  updateCheckedPermissions();
+}
+
+function updateCheckedPermissions() {
+  const permissions: string[] = [];
+  permissionTree.value.forEach(group => {
+    if (group.checked) {
+      permissions.push(group.value);
+    }
+    group.children?.forEach(child => {
+      if (child.checked) {
+        permissions.push(child.value);
+      }
+    });
+  });
+  permissionForm.value.checkedPermissions = permissions;
 }
 
 function submit() {
@@ -294,4 +363,40 @@ const handleCurrentChange = (val: number) => {
     font-weight: normal;
   }
 }
+
+.permission-form-item {
+  :deep(.el-form-item__content) {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.permission-header {
+  margin-bottom: 5px;
+  text-align: left;
+  
+  :deep(.el-checkbox) {
+    margin-left: 0;
+    font-weight: bold;
+  }
+}
+
+.permission-checkbox-group {
+  margin-top: 0;
+  
+  .permission-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    
+    .children-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-left: 24px;
+    }
+  }
+}
 </style>
+
