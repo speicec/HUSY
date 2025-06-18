@@ -22,10 +22,6 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 }
 
 app.use(ElementPlus, {
-  theme: {
-    primary: '#11d2c8',
-    success: '#409EFF',
-  },
   locale: zhCn,
 });
 app.use(router);
