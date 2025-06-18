@@ -107,11 +107,18 @@ const getGroupedPermissions = (permissions: string[]) => {
         </template>
       </el-table-column>
       <el-table-column prop="roleName" label="角色名称" width="180" />
-      <el-table-column prop="permissions" label="系统权限" min-width="980">
+      <el-table-column
+        prop="permissions"
+        style="margin: auto"
+        label="系统权限"
+        min-width="980"
+      >
         <template #default="{ row }">
           <div class="permissions-content">
             <div
-              v-for="(children, parent) in getGroupedPermissions(row.permissions)"
+              v-for="(children, parent) in getGroupedPermissions(
+                row.permissions,
+              )"
               :key="parent"
               class="permissions-item"
             >

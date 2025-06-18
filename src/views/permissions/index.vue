@@ -246,9 +246,10 @@ const handleCurrentChange = (val: number) => {
 
   :deep(.el-main) {
     :deep(.el-main) {
-      --el-main-padding: 0;
+      --el-main-padding: 5;
     }
     margin: 0;
+    padding: 0;
     height: calc(100vh - 120px);
     overflow: auto;
   }
