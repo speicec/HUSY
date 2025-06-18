@@ -9,14 +9,25 @@
 
         <!-- 右侧 -->
         <div class="flex items-center space-x-2">
-          <el-input
-            v-model="searchQuery"
-            placeholder="搜索角色信息"
-            style="margin-right: 12px"
-            @input="handleSearch"
-          ><el-icon>block</el-icon></el-input>
-          <el-button type="primary" @click="handleAdd">添加角色</el-button>
-          <el-button type="danger" @click="handleBatchDelete" :disabled="!selectedRows.length">批量删除</el-button>
+          <div class="Search-input flex">
+            <el-input
+                v-model="searchQuery"
+                placeholder="搜索角色信息"
+                class="flex-1"
+            >
+            </el-input>
+            <div class="Search-btn -ml-1">
+              <el-button @click="handleSearch" type="primary"> <el-icon><Search /></el-icon></el-button>
+            </div>
+          </div>
+          <el-button type="primary" @click="handleAdd">
+            <el-icon><Plus /></el-icon>
+
+            添加角色</el-button>
+          <el-button type="danger" @click="handleBatchDelete" :disabled="!selectedRows.length">
+
+            <el-icon><DeleteFilled /></el-icon>
+            批量删除</el-button>
         </div>
       </el-header>
 
@@ -36,16 +47,14 @@
           <el-table-column prop="roleName" label="角色名称" width="180" />
           <el-table-column prop="permissions" label="系统权限" min-width="980">
             <template #default="{ row }">
-              <el-tag
-                v-for="perm in row.permissions"
-                :key="perm"
-                class="mr-1 mb-1"
-                size="small"
-              >
-                {{ getPermissionLabel(perm) }}
-              </el-tag>
+              <div class="permissions-content">
+                <div v-for="(children, parent) in getGroupedPermissions(row.permissions)" :key="parent" class="permissions-item">
+                  <div>{{ parent }}：{{ children.join('，') }}；</div>
+                </div>
+              </div>
             </template>
           </el-table-column>
+
           <!--          <el-table-column prop="status" label="状态" width="100">-->
           <!--            <template #default="{ row }">-->
           <!--              <el-tag :type="row.status === 'active' ? 'success' : 'info'">-->
@@ -59,8 +68,8 @@
           <el-table-column fixed="right" label="操作" min-width="120" style="text-align: left">
             <template #default="{ row }">
               <div class="min-w-[100px] flex justify-end gap-2 pr-2">
-                <el-button size="small" type="primary" plain @click="handleEdit(row)">编辑</el-button>
-                <el-button size="small" type="danger" @click="handleDelete(row)">删除</el-button>
+                <el-button type="primary" plain @click="handleEdit(row)"  text>编辑</el-button>
+                <el-button type="danger" @click="handleDelete(row)" text style="margin-left: 0">删除</el-button>
               </div>
             </template>
           </el-table-column>
@@ -121,14 +130,16 @@
       </el-dialog>
 
       <el-footer>
-        <div class="demo-pagination-block">
+        <div class="custom" style="display: flex;justify-content: center">
+
           <el-pagination
-            v-model:current-page="currentPage"
+
             v-model:page-size="pageSize"
+            v-model:current-page="currentPage"
             :pager-count="10"
             :page-sizes="[10, 20, 50, 100]"
             :background="true"
-            layout="total, sizes, prev, pager, next, jumper"
+            layout="total, sizes,jumper,prev, pager, next,"
             :total="total"
             @size-change="handleSizeChange"
             @current-change="handleCurrentChange"
@@ -140,10 +151,13 @@
 </template>
 
 <script lang="ts" setup>
+import { Edit } from '@element-plus/icons-vue';
 import { ref, reactive, computed, onMounted } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { mockPermissions, permissionGroups, type Permission } from '@/mock/permissions';
+console.log(1111111111);
+console.log(mockPermissions);
 
 // 表格数据
 const tableData = ref<Permission[]>([]);
@@ -221,6 +235,36 @@ const getPermissionLabel = (value: string) => {
     if (child) return child.label;
   }
   return value;
+};
+
+// 获取权限父子关系
+const getPermissionParentChild = (value: string) => {
+  for (const group of permissionGroups) {
+    if (group.value === value) return group.value;
+    const child = group.children?.find(c => c.value === value);
+    if (child) return `${group.value}：${child.value}`;
+  }
+  return value;
+};
+
+// 获取分组后的权限
+const getGroupedPermissions = (permissions: string[]) => {
+  const grouped: { [key: string]: string[] } = {};
+
+  permissions.forEach(perm => {
+    for (const group of permissionGroups) {
+      const child = group.children?.find(c => c.value === perm);
+      if (child) {
+        if (!grouped[group.value]) {
+          grouped[group.value] = [];
+        }
+        grouped[group.value].push(child.value);
+        break;
+      }
+    }
+  });
+
+  return grouped;
 };
 
 // 选择行变化
@@ -433,6 +477,7 @@ const handleCurrentChange = (val: number) => {
 <style lang="scss" src="@/styles/reset.scss"></style>
 
 <style lang="scss" scoped>
+
 .common-layout {
   width: 100vw;
   height: 100vh;
@@ -610,6 +655,28 @@ const handleCurrentChange = (val: number) => {
       font-weight: bold;
     }
   }
+}
+
+.permissions-item{
+  display: inline-block;
+  text-align: center;
+  line-height: 1.5;
+}
+.permissions-content{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+  width: 100%;
+}
+
+
+.Search-btn{
+
+  display: inline-block;
+  margin-right: 12px;
 }
 </style>
 

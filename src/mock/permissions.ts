@@ -9,50 +9,50 @@ export interface Permission {
 
 export const permissionGroups = [
   {
-    label: '总览',
-    value: 'group-a',
+    label: 'group-a',
+    value: '总览',
     children: [
-      { label: '查看患者详情', value: 'ckhzxq' },
-      { label: '术前访视', value: 'sqfs' },
-      { label: '预警申报', value: 'yjsb' }
-    ]
+      { label: 'ckhzxq', value: '查看患者详情' },
+      { label: 'sqfs', value: '术前访视' },
+      { label: 'yjsb', value: '预警申报' },
+    ],
   },
   {
-    label: '排班',
-    value: 'group-b',
+    label: 'group-b',
+    value: '排班',
     children: [
-      { label: '查看个人排班', value: 'ckgrpb' },
-      { label: '查看全科排班', value: 'ckqkpb' }
-    ]
+      { label: 'ckgrp', value: '查看个人排班' },
+      { label: 'ckqkpb', value: '查看全科排班' },
+    ],
   },
   {
-    label: '访视',
-    value: 'group-c',
+    label: 'group-c',
+    value: '访视',
     children: [
-      { label: '查看个人访视', value: 'ckgrfs' },
-      { label: '查看全科访视', value: 'ckqkfs' }
-    ]
+      { label: 'ckgrfs', value: '查看个人访视' },
+      { label: 'ckqkfs', value: '查看全科访视' },
+    ],
   },
   {
-    label: '预警',
-    value: 'group-d',
+    label: 'group-d',
+    value: '报警',
     children: [
-      { label: '查看报警详情', value: 'ckbjxq' },
-      { label: '处理报警', value: 'clbj' }
-    ]
+      { label: 'ckbjxq', value: '查看报警详情' },
+      { label: 'clbj', value: '处理报警' },
+    ],
   },
   {
-    label: '工作量统计',
-    value: 'group-e',
+    label: 'group-e',
+    value: '工作量统计',
     children: [
-      { label: '查看个人工作量', value: 'ckgrgzl' },
-      { label: '查看全科工作量', value: 'ckqkgzl' }
-    ]
+      { label: 'ckgrgzl', value: '查看个人工作量' },
+      { label: 'ckqkgzl', value: '查看全科工作量' },
+    ],
   },
   {
-    label: '查看个人工作报告',
-    value: 'group-f'
-  }
+    label: 'group-f',
+    value: '查看个人工作报告',
+  },
 ];
 
 // Generate mock data
@@ -64,12 +64,16 @@ const generateMockData = (): Permission[] => {
   for (let i = 1; i <= 50; i++) {
     const roleType = roles[Math.floor(Math.random() * roles.length)];
     const permissions = permissionGroups
-      .flatMap(group => group.children || [group])
+      .flatMap((group) => group.children || [group])
       .filter(() => Math.random() > 0.3)
-      .map(p => p.value);
+      .map((p) => p.value);
 
-    const createTime = new Date(Date.now() - Math.random() * 10000000000).toISOString();
-    const updateTime = new Date(Date.now() - Math.random() * 1000000000).toISOString();
+    const createTime = new Date(
+      Date.now() - Math.random() * 10000000000,
+    ).toISOString();
+    const updateTime = new Date(
+      Date.now() - Math.random() * 1000000000,
+    ).toISOString();
 
     data.push({
       id: i,
@@ -77,7 +81,7 @@ const generateMockData = (): Permission[] => {
       permissions,
       createTime,
       updateTime,
-      status: statuses[Math.floor(Math.random() * statuses.length)]
+      status: statuses[Math.floor(Math.random() * statuses.length)],
     });
   }
 
