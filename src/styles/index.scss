@@ -3,7 +3,7 @@
     'primary': (
       'base': green,
     ),
-   'success': (
+    'success': (
       'base': #46b61f,
     ),
     'warning': (
@@ -14,13 +14,10 @@
     ),
     'info': (
       'base': #974ce7,
-    )
-
+    ),
   )
 );
 //@use "@/styles/reset.scss";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-

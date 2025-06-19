@@ -30,7 +30,7 @@ const handleCurrentChange = (val: number) => {
     <el-pagination
       v-model:page-size="pageSize"
       v-model:current-page="currentPage"
-      :pager-count="10"
+      :pager-count="7"
       :page-sizes="[10, 20, 50, 100]"
       :background="true"
       layout="total, sizes,jumper,prev, pager, next,"

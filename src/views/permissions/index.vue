@@ -92,11 +92,11 @@ const handleSearch = (query: string) => {
     tableData.value = [...mockPermissions];
   } else {
     tableData.value = mockPermissions.filter(
-      (item) =>
+      item =>
         item.roleName.toLowerCase().includes(query.toLowerCase()) ||
-        item.permissions.some((p) =>
-          getPermissionLabel(p).toLowerCase().includes(query.toLowerCase()),
-        ),
+        item.permissions.some(p =>
+          getPermissionLabel(p).toLowerCase().includes(query.toLowerCase())
+        )
     );
   }
   total.value = tableData.value.length;
@@ -107,7 +107,7 @@ const handleSearch = (query: string) => {
 const getPermissionLabel = (value: string) => {
   for (const group of permissionGroups) {
     if (group.value === value) return group.label;
-    const child = group.children?.find((c) => c.value === value);
+    const child = group.children?.find(c => c.value === value);
     if (child) return child.label;
   }
   return value;
@@ -140,7 +140,7 @@ const handleDelete = (row: Permission) => {
     type: 'warning',
   })
     .then(() => {
-      const index = tableData.value.findIndex((item) => item.id === row.id);
+      const index = tableData.value.findIndex(item => item.id === row.id);
       if (index !== -1) {
         tableData.value.splice(index, 1);
         total.value = tableData.value.length;
@@ -161,13 +161,11 @@ const handleBatchDelete = () => {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning',
-    },
+    }
   )
     .then(() => {
-      const ids = selectedRows.value.map((row) => row.id);
-      tableData.value = tableData.value.filter(
-        (item) => !ids.includes(item.id),
-      );
+      const ids = selectedRows.value.map(row => row.id);
+      tableData.value = tableData.value.filter(item => !ids.includes(item.id));
       total.value = tableData.value.length;
       ElMessage.success('批量删除成功');
     })
@@ -181,7 +179,7 @@ const handleSubmit = (formData: any) => {
   if (isEdit.value && editData.value) {
     // 编辑现有角色
     const index = tableData.value.findIndex(
-      (item) => item.id === editData.value?.id,
+      item => item.id === editData.value?.id
     );
     if (index !== -1) {
       tableData.value[index] = {
@@ -195,7 +193,7 @@ const handleSubmit = (formData: any) => {
   } else {
     // 添加新角色
     const newRole: Permission = {
-      id: Math.max(...tableData.value.map((item) => item.id)) + 1,
+      id: Math.max(...tableData.value.map(item => item.id)) + 1,
       roleName: formData.roleName,
       permissions: formData.permissions,
       createTime: now,
@@ -246,10 +244,10 @@ const handleCurrentChange = (val: number) => {
 
   :deep(.el-main) {
     :deep(.el-main) {
-      --el-main-padding: 5;
+      --el-main-padding: 20;
     }
     margin: 0;
-    padding: 0;
+    padding: 20;
     height: calc(100vh - 120px);
     overflow: auto;
   }

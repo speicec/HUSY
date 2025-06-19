@@ -30,11 +30,7 @@ const handleBatchDelete = () => {
 <template>
   <div class="flex items-center space-x-2">
     <div class="Search-input flex">
-      <el-input
-        v-model="searchQuery"
-        placeholder="搜索角色信息"
-        class="flex-1"
-      >
+      <el-input v-model="searchQuery" placeholder="搜索角色信息" class="flex-1">
       </el-input>
       <div class="Search-btn -ml-1">
         <el-button @click="handleSearch" type="primary">

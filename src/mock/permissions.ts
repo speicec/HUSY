@@ -64,15 +64,15 @@ const generateMockData = (): Permission[] => {
   for (let i = 1; i <= 50; i++) {
     const roleType = roles[Math.floor(Math.random() * roles.length)];
     const permissions = permissionGroups
-      .flatMap((group) => group.children || [group])
+      .flatMap(group => group.children || [group])
       .filter(() => Math.random() > 0.3)
-      .map((p) => p.value);
+      .map(p => p.value);
 
     const createTime = new Date(
-      Date.now() - Math.random() * 10000000000,
+      Date.now() - Math.random() * 10000000000
     ).toISOString();
     const updateTime = new Date(
-      Date.now() - Math.random() * 1000000000,
+      Date.now() - Math.random() * 1000000000
     ).toISOString();
 
     data.push({

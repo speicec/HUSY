@@ -1,6 +1,6 @@
 <template>
   <div class="common-layout">
-    <el-container style="margin: 0; weight: 100%">
+    <el-container style="margin: 0; width: 100%">
       <el-header class="flex justify-between items-center px-4 h-16">
         <!-- 左侧 -->
         <div
@@ -30,6 +30,7 @@
 
             添加角色</el-button
           >
+
           <el-button
             type="danger"
             @click="handleBatchDelete"
@@ -60,7 +61,7 @@
               <div class="permissions-content">
                 <div
                   v-for="(children, parent) in getGroupedPermissions(
-                    row.permissions,
+                    row.permissions
                   )"
                   :key="parent"
                   class="permissions-item"
@@ -147,7 +148,7 @@
                 <el-checkbox
                   v-model="group.checked"
                   :indeterminate="group.indeterminate"
-                  @change="(val) => handleGroupChange(val, group)"
+                  @change="(val: any) => handleGroupChange(val, group)"
                   style="font-weight: bold"
                 >
                   {{ group.value }}
@@ -157,7 +158,7 @@
                     v-for="child in group.children"
                     :key="child.value"
                     v-model="child.checked"
-                    @change="(val) => handleChildChange(val, child, group)"
+                    @change="(val: any) => handleChildChange(val, child, group)"
                   >
                     {{ child.value }}
                   </el-checkbox>
@@ -179,7 +180,7 @@
           <el-pagination
             v-model:page-size="pageSize"
             v-model:current-page="currentPage"
-            :pager-count="10"
+            :pager-count="7"
             :page-sizes="[10, 20, 50, 100]"
             :background="true"
             layout="total, sizes,jumper,prev, pager, next,"
@@ -194,7 +195,6 @@
 </template>
 
 <script lang="ts" setup>
-import { Edit } from '@element-plus/icons-vue';
 import { ref, reactive, computed, onMounted } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
 import { ElMessage, ElMessageBox } from 'element-plus';
@@ -203,8 +203,7 @@ import {
   permissionGroups,
   type Permission,
 } from '@/mock/permissions';
-console.log(1111111111);
-console.log(mockPermissions);
+import { DeleteFilled, Plus, Search } from '@element-plus/icons-vue';
 
 // 表格数据
 const tableData = ref<Permission[]>([]);
@@ -238,15 +237,15 @@ const rules = reactive<FormRules>({
 
 // 权限树数据
 const permissionTree = ref(
-  permissionGroups.map((group) => ({
+  permissionGroups.map((group: any) => ({
     ...group,
     checked: false,
     indeterminate: false,
-    children: group.children?.map((child) => ({
+    children: group.children?.map((child: any) => ({
       ...child,
       checked: false,
     })),
-  })),
+  }))
 );
 
 // 计算属性：过滤后的表格数据
@@ -268,13 +267,13 @@ const handleSearch = () => {
     tableData.value = [...mockPermissions];
   } else {
     tableData.value = mockPermissions.filter(
-      (item) =>
+      (item: any) =>
         item.roleName.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-        item.permissions.some((p) =>
+        item.permissions.some((p: string) =>
           getPermissionLabel(p)
             .toLowerCase()
-            .includes(searchQuery.value.toLowerCase()),
-        ),
+            .includes(searchQuery.value.toLowerCase())
+        )
     );
   }
   total.value = tableData.value.length;
@@ -285,29 +284,29 @@ const handleSearch = () => {
 const getPermissionLabel = (value: string) => {
   for (const group of permissionGroups) {
     if (group.value === value) return group.label;
-    const child = group.children?.find((c) => c.value === value);
+    const child = group.children?.find((c: any) => c.value === value);
     if (child) return child.label;
   }
   return value;
 };
 
-// 获取权限父子关系
-const getPermissionParentChild = (value: string) => {
-  for (const group of permissionGroups) {
-    if (group.value === value) return group.value;
-    const child = group.children?.find((c) => c.value === value);
-    if (child) return `${group.value}：${child.value}`;
-  }
-  return value;
-};
+// 获取权限父子关系 (暂时保留，可能在其他地方使用)
+// const getPermissionParentChild = (value: string) => {
+//   for (const group of permissionGroups) {
+//     if (group.value === value) return group.value;
+//     const child = group.children?.find(c => c.value === value);
+//     if (child) return `${group.value}：${child.value}`;
+//   }
+//   return value;
+// };
 
 // 获取分组后的权限
 const getGroupedPermissions = (permissions: string[]) => {
   const grouped: { [key: string]: string[] } = {};
 
-  permissions.forEach((perm) => {
+  permissions.forEach((perm: string) => {
     for (const group of permissionGroups) {
-      const child = group.children?.find((c) => c.value === perm);
+      const child = group.children?.find((c: any) => c.value === perm);
       if (child) {
         if (!grouped[group.value]) {
           grouped[group.value] = [];
@@ -361,7 +360,9 @@ const handleDelete = (row: Permission) => {
     type: 'warning',
   })
     .then(() => {
-      const index = tableData.value.findIndex((item) => item.id === row.id);
+      const index = tableData.value.findIndex(
+        (item: Permission) => item.id === row.id
+      );
       if (index !== -1) {
         tableData.value.splice(index, 1);
         total.value = tableData.value.length;
@@ -382,12 +383,12 @@ const handleBatchDelete = () => {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning',
-    },
+    }
   )
     .then(() => {
-      const ids = selectedRows.value.map((row) => row.id);
+      const ids = selectedRows.value.map((row: Permission) => row.id);
       tableData.value = tableData.value.filter(
-        (item) => !ids.includes(item.id),
+        (item: Permission) => !ids.includes(item.id)
       );
       total.value = tableData.value.length;
       ElMessage.success('批量删除成功');
@@ -397,10 +398,10 @@ const handleBatchDelete = () => {
 
 // 重置权限树
 const resetPermissionTree = () => {
-  permissionTree.value.forEach((group) => {
+  permissionTree.value.forEach((group: any) => {
     group.checked = false;
     group.indeterminate = false;
-    group.children?.forEach((child) => {
+    group.children?.forEach((child: any) => {
       child.checked = false;
     });
   });
@@ -408,16 +409,16 @@ const resetPermissionTree = () => {
 
 // 更新权限树
 const updatePermissionTree = (permissions: string[]) => {
-  permissionTree.value.forEach((group) => {
+  permissionTree.value.forEach((group: any) => {
     if (group.children) {
-      const childrenChecked = group.children.filter((child) =>
-        permissions.includes(child.value),
+      const childrenChecked = group.children.filter((child: any) =>
+        permissions.includes(child.value)
       );
       group.checked = childrenChecked.length === group.children.length;
       group.indeterminate =
         childrenChecked.length > 0 &&
         childrenChecked.length < group.children.length;
-      group.children.forEach((child) => {
+      group.children.forEach((child: any) => {
         child.checked = permissions.includes(child.value);
       });
     } else {
@@ -461,18 +462,20 @@ const handleChildChange = (val: boolean, child: any, group: any) => {
     group.indeterminate =
       checkedCount > 0 && checkedCount < group.children.length;
   }
-
+  if (child) {
+    console.log(child);
+  }
   updateCheckedPermissions();
 };
 
 // 更新选中的权限
 const updateCheckedPermissions = () => {
   const permissions: string[] = [];
-  permissionTree.value.forEach((group) => {
+  permissionTree.value.forEach((group: any) => {
     if (group.checked) {
       permissions.push(group.value);
     }
-    group.children?.forEach((child) => {
+    group.children?.forEach((child: any) => {
       if (child.checked) {
         permissions.push(child.value);
       }
@@ -485,7 +488,7 @@ const updateCheckedPermissions = () => {
 const submitForm = async () => {
   if (!formRef.value) return;
 
-  await formRef.value.validate((valid) => {
+  await formRef.value.validate(valid => {
     if (valid) {
       const now = new Date().toISOString();
       const permissions = permissionForm.value.noPermission
@@ -495,7 +498,7 @@ const submitForm = async () => {
       if (isEdit.value) {
         // 编辑现有角色
         const index = tableData.value.findIndex(
-          (item) => item.id === permissionForm.value.id,
+          (item: Permission) => item.id === permissionForm.value.id
         );
         if (index !== -1) {
           tableData.value[index] = {
@@ -509,7 +512,8 @@ const submitForm = async () => {
       } else {
         // 添加新角色
         const newRole: Permission = {
-          id: Math.max(...tableData.value.map((item) => item.id)) + 1,
+          id:
+            Math.max(...tableData.value.map((item: Permission) => item.id)) + 1,
           roleName: permissionForm.value.roleName,
           permissions,
           createTime: now,
@@ -561,9 +565,7 @@ const handleCurrentChange = (val: number) => {
   }
 
   :deep(.el-main) {
-    :deep(.el-main) {
-      --el-main-padding: 5px;
-    }
+    --el-main-padding: 5px;
     margin: 0;
     height: calc(100vh - 120px);
     overflow: auto;
@@ -595,10 +597,13 @@ const handleCurrentChange = (val: number) => {
   color: #11d2c8;
 }
 
-:deep(.el-pagination.is-background .el-pager li:not(.is-disabled).is-active) {
+:deep(.el-pagination.is-background .el-pager li.is-active) {
   background-color: #11d2c8;
 }
 
+:deep(.el-pagination) {
+  --el-pagination-hover-color: #11d2c8;
+}
 :deep(.el-checkbox__input.is-checked .el-checkbox__inner) {
   background-color: #11d2c8;
   border-color: #11d2c8;

@@ -17,7 +17,7 @@ const emit = defineEmits<{
 
 const dialogVisible = computed({
   get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value),
+  set: value => emit('update:modelValue', value),
 });
 
 const formRef = ref<FormInstance>();
@@ -38,38 +38,38 @@ const rules = reactive<FormRules>({
 });
 
 const permissionTree = ref(
-  props.permissionGroups.map((group) => ({
+  props.permissionGroups.map(group => ({
     ...group,
     checked: false,
     indeterminate: false,
-    children: group.children?.map((child) => ({
+    children: group.children?.map(child => ({
       ...child,
       checked: false,
     })),
-  })),
+  }))
 );
 
 const resetPermissionTree = () => {
-  permissionTree.value.forEach((group) => {
+  permissionTree.value.forEach(group => {
     group.checked = false;
     group.indeterminate = false;
-    group.children?.forEach((child) => {
+    group.children?.forEach(child => {
       child.checked = false;
     });
   });
 };
 
 const updatePermissionTree = (permissions: string[]) => {
-  permissionTree.value.forEach((group) => {
+  permissionTree.value.forEach(group => {
     if (group.children) {
-      const childrenChecked = group.children.filter((child) =>
-        permissions.includes(child.value),
+      const childrenChecked = group.children.filter(child =>
+        permissions.includes(child.value)
       );
       group.checked = childrenChecked.length === group.children.length;
       group.indeterminate =
         childrenChecked.length > 0 &&
         childrenChecked.length < group.children.length;
-      group.children.forEach((child) => {
+      group.children.forEach(child => {
         child.checked = permissions.includes(child.value);
       });
     } else {
@@ -116,11 +116,11 @@ const handleChildChange = (val: boolean, child: any, group: any) => {
 
 const updateCheckedPermissions = () => {
   const permissions: string[] = [];
-  permissionTree.value.forEach((group) => {
+  permissionTree.value.forEach(group => {
     if (group.checked) {
       permissions.push(group.value);
     }
-    group.children?.forEach((child) => {
+    group.children?.forEach(child => {
       if (child.checked) {
         permissions.push(child.value);
       }
@@ -136,11 +136,13 @@ const handleCancel = () => {
 const handleSubmit = async () => {
   if (!formRef.value) return;
 
-  await formRef.value.validate((valid) => {
+  await formRef.value.validate(valid => {
     if (valid) {
       emit('submit', {
         ...form.value,
-        permissions: form.value.noPermission ? [] : form.value.checkedPermissions,
+        permissions: form.value.noPermission
+          ? []
+          : form.value.checkedPermissions,
       });
     }
   });
@@ -203,7 +205,7 @@ if (props.editData) {
             <el-checkbox
               v-model="group.checked"
               :indeterminate="group.indeterminate"
-              @change="(val) => handleGroupChange(val, group)"
+              @change="(val: any) => handleGroupChange(val, group)"
               style="font-weight: bold"
             >
               {{ group.value }}
@@ -213,7 +215,7 @@ if (props.editData) {
                 v-for="child in group.children"
                 :key="child.value"
                 v-model="child.checked"
-                @change="(val) => handleChildChange(val, child, group)"
+                @change="(val: any) => handleChildChange(val, child, group)"
               >
                 {{ child.value }}
               </el-checkbox>

@@ -75,7 +75,7 @@ const handleDelete = (row: Permission) => {
 const getGroupedPermissions = (permissions: string[]) => {
   const grouped: { [key: string]: string[] } = {};
 
-  permissions.forEach((perm) => {
+  permissions.forEach(perm => {
     for (const group of props.permissionGroups) {
       const child = group.children?.find((c: any) => c.value === perm);
       if (child) {
@@ -117,7 +117,7 @@ const getGroupedPermissions = (permissions: string[]) => {
           <div class="permissions-content">
             <div
               v-for="(children, parent) in getGroupedPermissions(
-                row.permissions,
+                row.permissions
               )"
               :key="parent"
               class="permissions-item"
