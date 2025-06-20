@@ -14,6 +14,14 @@
   width: 100%;
 }
 
+.no-permission {
+  color: #909399;
+  font-style: italic;
+  text-align: center;
+  width: 100%;
+  padding: 8px 0;
+}
+
 :deep(.el-table) {
   .el-table__header-wrapper {
     th.el-table__cell {

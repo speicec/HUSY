@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-import type { Permission } from '@/mock/permissions';
+import { ElMessage, ElMessageBox } from 'element-plus';
+import type { Permission } from '@/types/permission';
+import { TableActions, type TableActionEvent } from '@/types/EventTypes';
 
 const props = defineProps<{
   tableData: Permission[];
@@ -7,21 +9,37 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'selection-change', rows: Permission[]): void;
-  (e: 'edit', row: Permission): void;
-  (e: 'delete', row: Permission): void;
+  (e: 'action', event: TableActionEvent): void;
 }>();
 
+// 选择变化处理
 const handleSelectionChange = (rows: Permission[]) => {
-  emit('selection-change', rows);
+  emit('action', { type: TableActions.SELECT, payload: rows });
 };
 
+// 内部编辑逻辑
 const handleEdit = (row: Permission) => {
-  emit('edit', row);
+  emit('action', { type: TableActions.EDIT, payload: row });
 };
 
-const handleDelete = (row: Permission) => {
-  emit('delete', row);
+// 内部删除逻辑
+const handleDelete = async (row: Permission) => {
+  try {
+    await ElMessageBox.confirm(
+      `确定要删除角色 "${row.roleName}" 吗？`,
+      '删除确认',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }
+    );
+
+    emit('action', { type: TableActions.DELETE, payload: row });
+    ElMessage.success('删除成功');
+  } catch {
+    ElMessage.info('已取消删除');
+  }
 };
 
 const getGroupedPermissions = (permissions: string[]) => {
@@ -62,14 +80,19 @@ const getGroupedPermissions = (permissions: string[]) => {
       <el-table-column prop="permissions" label="系统权限" min-width="980">
         <template #default="{ row }">
           <div class="permissions-content">
-            <div
-              v-for="(children, parent) in getGroupedPermissions(
-                row.permissions
-              )"
-              :key="parent"
-              class="permissions-item"
-            >
-              <div>{{ parent }}：{{ children.join('，') }}；</div>
+            <!-- 显示无医生端权限 -->
+            <div v-if="row.noPermission">无医生端权限</div>
+            <!-- 显示具体权限 -->
+            <div v-else>
+              <div
+                v-for="(children, parent) in getGroupedPermissions(
+                  row.permissions
+                )"
+                :key="parent"
+                class="permissions-item"
+              >
+                <div>{{ parent }}：{{ children.join('，') }}；</div>
+              </div>
             </div>
           </div>
         </template>

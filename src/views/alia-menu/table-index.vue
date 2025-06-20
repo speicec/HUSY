@@ -13,36 +13,32 @@
         <!-- 右侧 -->
         <Toolbar
           :selected-rows="selectedRows"
-          @search="handleSearch"
-          @add="handleAdd"
-          @batch-delete="handleBatchDelete"
+          :table-data="tableData"
+          :total="total"
+          @action="handleToolbarAction"
         />
       </el-header>
 
       <PermissionTable
-        :table-data="filteredTableData"
+        :table-data="paginatedData"
         :permission-groups="permissionGroups"
-        @selection-change="handleSelectionChange"
-        @edit="handleEdit"
-        @delete="handleDelete"
+        @action="handleTableAction"
       />
 
       <PermissionDialog
-        v-model:visible="dialogFormVisible"
-        :is-edit="isEdit"
-        :permission-form="permissionForm"
-        :permission-tree="permissionTree"
-        @submit="submitForm"
-        @no-permission-change="handleNoPermissionChange"
-        @group-change="handleGroupChange"
-        @child-change="handleChildChange"
+        ref="permissionDialogRef"
+        :table-data="tableData"
+        :total="total"
+        @action="handleDialogAction"
       />
 
       <el-footer>
         <Pagination
+          ref="paginationRef"
           :total="total"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
+          :current-page="currentPage"
+          :page-size="pageSize"
+          @action="handlePaginationAction"
         />
       </el-footer>
     </el-container>
@@ -50,13 +46,26 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, onMounted } from 'vue';
-import { ElMessage, ElMessageBox } from 'element-plus';
+import { ref } from 'vue';
+
+import { mockPermissions, permissionGroups } from '@/mock/permissions';
+import type { Permission } from '@/types/permission';
+
+// 导入事件类型
 import {
-  mockPermissions,
-  permissionGroups,
-  type Permission,
-} from '@/mock/permissions';
+  ToolbarActions,
+  TableActions,
+  DialogActions,
+  PaginationActions,
+  type ToolbarActionEvent,
+  type TableActionEvent,
+  type DialogActionEvent,
+  type PaginationActionEvent,
+} from '@/types/EventTypes';
+
+// 导入 composables
+import { useTableManager } from '@/composables/useTableManager';
+import { usePagination } from '@/composables/usePagination';
 
 // 导入组件
 import Toolbar from './components/toolbar/index.vue';
@@ -64,77 +73,34 @@ import PermissionTable from './components/permission-table/index.vue';
 import PermissionDialog from './components/permission-dialog/index.vue';
 import Pagination from './components/pagination/index.vue';
 
-// 表格数据
-const tableData = ref<Permission[]>([]);
-const selectedRows = ref<Permission[]>([]);
-const currentPage = ref(1);
-const pageSize = ref(10);
-const total = ref(0);
+// ==================== 状态层 ====================
+// 表格数据管理
+const tableManager = useTableManager(mockPermissions); //初始化数据
+const { tableData, selectedRows, total } = tableManager;
 
-// 对话框相关
-const dialogFormVisible = ref(false);
-const isEdit = ref(false);
+// 分页管理
+const pagination = usePagination(tableData, 10);
+const { paginatedData, currentPage, pageSize } = pagination;
 
-// 表单数据
-const permissionForm = ref({
-  id: 0,
-  roleName: '',
-  noPermission: false,
-  checkedPermissions: [] as string[],
-});
+// ==================== 展示层引用 ====================
+const permissionDialogRef = ref();
+const paginationRef = ref();
 
-// 权限树数据
-const permissionTree = ref(
-  permissionGroups.map((group: any) => ({
-    ...group,
-    checked: false,
-    indeterminate: false,
-    children: group.children?.map((child: any) => ({
-      ...child,
-      checked: false,
-    })),
-  }))
-);
+// 权限树数据已移动到PermissionDialog组件内部
 
-// 计算属性：过滤后的表格数据
-const filteredTableData = computed(() => {
-  const start = (currentPage.value - 1) * pageSize.value;
-  const end = start + pageSize.value;
-  return tableData.value.slice(start, end);
-});
+// // 获取权限标签
+// const getPermissionLabel = (value: string) => {
+//   for (const group of permissionGroups) {
+//     if (group.value === value) return group.label;
+//     const child = group.children?.find((c: any) => c.value === value);
+//     if (child) return child.label;
+//   }
+//   return value;
+// };
 
 // 初始化数据
-onMounted(() => {
-  tableData.value = [...mockPermissions];
-  total.value = tableData.value.length;
-});
 
-// 搜索处理
-const handleSearch = (query: string) => {
-  if (!query) {
-    tableData.value = [...mockPermissions];
-  } else {
-    tableData.value = mockPermissions.filter(
-      (item: any) =>
-        item.roleName.toLowerCase().includes(query.toLowerCase()) ||
-        item.permissions.some((p: string) =>
-          getPermissionLabel(p).toLowerCase().includes(query.toLowerCase())
-        )
-    );
-  }
-  total.value = tableData.value.length;
-  currentPage.value = 1;
-};
-
-// 获取权限标签
-const getPermissionLabel = (value: string) => {
-  for (const group of permissionGroups) {
-    if (group.value === value) return group.label;
-    const child = group.children?.find((c: any) => c.value === value);
-    if (child) return child.label;
-  }
-  return value;
-};
+// 搜索、添加、批量删除逻辑已移动到 Toolbar 组件内部
 
 // 获取权限父子关系 (暂时保留，可能在其他地方使用)
 // const getPermissionParentChild = (value: string) => {
@@ -146,218 +112,80 @@ const getPermissionLabel = (value: string) => {
 //   return value;
 // };
 
-// 选择行变化
-const handleSelectionChange = (rows: Permission[]) => {
-  selectedRows.value = rows;
+// ==================== 事件分发器 ====================
+// 表格操作处理
+const handleTableAction = (event: TableActionEvent) => {
+  switch (event.type) {
+    case TableActions.SELECT:
+      tableManager.setSelectedRows(event.payload);
+      break;
+    case TableActions.EDIT:
+      // 调用对话框组件的编辑方法
+      permissionDialogRef.value?.openEditDialog(event.payload);
+      break;
+    case TableActions.DELETE:
+      handleDelete(event.payload);
+      break;
+  }
 };
 
-// 添加角色
-const handleAdd = () => {
-  isEdit.value = false;
-  permissionForm.value = {
-    id: 0,
-    roleName: '',
-    noPermission: false,
-    checkedPermissions: [],
-  };
-  resetPermissionTree();
-  dialogFormVisible.value = true;
+// 工具栏操作处理
+const handleToolbarAction = (event: ToolbarActionEvent) => {
+  switch (event.type) {
+    case ToolbarActions.SEARCH:
+      tableManager.replaceData(event.payload.tableData);
+      pagination.resetPagination();
+      break;
+    case ToolbarActions.ADD:
+      // 调用对话框组件的添加方法
+      permissionDialogRef.value?.openAddDialog();
+      break;
+    case ToolbarActions.BATCH_DELETE:
+      tableManager.replaceData(event.payload.tableData);
+      tableManager.clearSelectedRows();
+      pagination.resetPagination();
+      break;
+  }
 };
 
-// 编辑角色
-const handleEdit = (row: Permission) => {
-  isEdit.value = true;
-  permissionForm.value = {
-    id: row.id,
-    roleName: row.roleName,
-    noPermission: row.permissions.length === 0,
-    checkedPermissions: [...row.permissions],
-  };
-  resetPermissionTree();
-  updatePermissionTree(row.permissions);
-  dialogFormVisible.value = true;
+// 对话框操作处理
+const handleDialogAction = (event: DialogActionEvent) => {
+  switch (event.type) {
+    case DialogActions.SUBMIT:
+      tableManager.replaceData(event.payload.tableData);
+      // 分页会自动重新计算
+      break;
+  }
 };
+
+// 分页操作处理
+const handlePaginationAction = (event: PaginationActionEvent) => {
+  switch (event.type) {
+    case PaginationActions.CHANGE:
+      if (event.payload.type === 'size-change') {
+        pagination.changePageSize(event.payload.pageSize);
+      } else if (event.payload.type === 'current-change') {
+        pagination.changePage(event.payload.currentPage);
+      }
+      break;
+  }
+};
+
+// // 选择行变化
+// const handleSelectionChange = (rows: Permission[]) => {
+//   selectedRows.value = rows;
+// };
 
 // 删除角色
 const handleDelete = (row: Permission) => {
-  ElMessageBox.confirm('确定要删除该角色吗？', '警告', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning',
-  })
-    .then(() => {
-      const index = tableData.value.findIndex(
-        (item: Permission) => item.id === row.id
-      );
-      if (index !== -1) {
-        tableData.value.splice(index, 1);
-        total.value = tableData.value.length;
-        ElMessage.success('删除成功');
-      }
-    })
-    .catch(() => {});
+  tableManager.deleteRow(row.id);
+  // ElMessage.success('删除成功'); // 消息已在组件内部处理
 };
 
-// 批量删除
-const handleBatchDelete = () => {
-  if (selectedRows.value.length === 0) return;
-
-  ElMessageBox.confirm(
-    `确定要删除选中的 ${selectedRows.value.length} 个角色吗？`,
-    '警告',
-    {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning',
-    }
-  )
-    .then(() => {
-      const ids = selectedRows.value.map((row: Permission) => row.id);
-      tableData.value = tableData.value.filter(
-        (item: Permission) => !ids.includes(item.id)
-      );
-      total.value = tableData.value.length;
-      ElMessage.success('批量删除成功');
-    })
-    .catch(() => {});
-};
-
-// 重置权限树
-const resetPermissionTree = () => {
-  permissionTree.value.forEach((group: any) => {
-    group.checked = false;
-    group.indeterminate = false;
-    group.children?.forEach((child: any) => {
-      child.checked = false;
-    });
-  });
-};
-
-// 更新权限树
-const updatePermissionTree = (permissions: string[]) => {
-  permissionTree.value.forEach((group: any) => {
-    if (group.children) {
-      const childrenChecked = group.children.filter((child: any) =>
-        permissions.includes(child.value)
-      );
-      group.checked = childrenChecked.length === group.children.length;
-      group.indeterminate =
-        childrenChecked.length > 0 &&
-        childrenChecked.length < group.children.length;
-      group.children.forEach((child: any) => {
-        child.checked = permissions.includes(child.value);
-      });
-    } else {
-      group.checked = permissions.includes(group.value);
-    }
-  });
-};
-
-// 无权限变更
-const handleNoPermissionChange = (val: boolean) => {
-  if (val) {
-    resetPermissionTree();
-  }
-};
-
-// 组权限变更
-const handleGroupChange = (val: boolean, group: any) => {
-  if (val) {
-    permissionForm.value.noPermission = false;
-  }
-
-  if (group.children) {
-    group.children.forEach((child: any) => {
-      child.checked = val;
-    });
-    group.indeterminate = false;
-  }
-
-  updateCheckedPermissions();
-};
-
-// 子权限变更
-const handleChildChange = (val: boolean, child: any, group: any) => {
-  if (val) {
-    permissionForm.value.noPermission = false;
-  }
-
-  if (group.children) {
-    const checkedCount = group.children.filter((c: any) => c.checked).length;
-    group.checked = checkedCount === group.children.length;
-    group.indeterminate =
-      checkedCount > 0 && checkedCount < group.children.length;
-  }
-  if (child) {
-    console.log(child);
-  }
-  updateCheckedPermissions();
-};
-
-// 更新选中的权限
-const updateCheckedPermissions = () => {
-  const permissions: string[] = [];
-  permissionTree.value.forEach((group: any) => {
-    if (group.checked) {
-      permissions.push(group.value);
-    }
-    group.children?.forEach((child: any) => {
-      if (child.checked) {
-        permissions.push(child.value);
-      }
-    });
-  });
-  permissionForm.value.checkedPermissions = permissions;
-};
-
-// 提交表单
-const submitForm = (formData: any) => {
-  const now = new Date().toISOString();
-  const permissions = formData.noPermission
-    ? []
-    : permissionForm.value.checkedPermissions;
-
-  if (isEdit.value) {
-    // 编辑现有角色
-    const index = tableData.value.findIndex(
-      (item: Permission) => item.id === permissionForm.value.id
-    );
-    if (index !== -1) {
-      tableData.value[index] = {
-        ...tableData.value[index],
-        roleName: formData.roleName,
-        permissions,
-        updateTime: now,
-      };
-      ElMessage.success('编辑成功');
-    }
-  } else {
-    // 添加新角色
-    const newRole: Permission = {
-      id: Math.max(...tableData.value.map((item: Permission) => item.id)) + 1,
-      roleName: formData.roleName,
-      permissions,
-      createTime: now,
-      updateTime: now,
-      status: 'active',
-    };
-    tableData.value.unshift(newRole);
-    total.value = tableData.value.length;
-    ElMessage.success('添加成功');
-  }
-
-  dialogFormVisible.value = false;
-};
-
-// 分页处理
-const handleSizeChange = (val: number) => {
-  pageSize.value = val;
-  currentPage.value = 1;
-};
-
-const handleCurrentChange = (val: number) => {
-  currentPage.value = val;
-};
+// 批量删除逻辑已移动到 Toolbar 组件内部
+// 权限树管理逻辑已移动到 PermissionDialog 组件内部
+// 表单提交逻辑已移动到 PermissionDialog 组件内部
+// 分页处理逻辑已移动到 Pagination 组件内部
 </script>
 
 <style lang="scss" src="@/styles/reset.scss"></style>

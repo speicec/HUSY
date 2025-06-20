@@ -1,13 +1,6 @@
-export interface Permission {
-  id: number;
-  roleName: string;
-  permissions: string[];
-  createTime: string;
-  updateTime: string;
-  status: 'active' | 'inactive';
-}
+import type { Permission, PermissionGroup } from '@/types/permission';
 
-export const permissionGroups = [
+export const permissionGroups: PermissionGroup[] = [
   {
     label: 'group-a',
     value: '总览',
@@ -63,10 +56,13 @@ const generateMockData = (): Permission[] => {
 
   for (let i = 1; i <= 50; i++) {
     const roleType = roles[Math.floor(Math.random() * roles.length)];
-    const permissions = permissionGroups
-      .flatMap(group => group.children || [group])
-      .filter(() => Math.random() > 0.3)
-      .map(p => p.value);
+    const noPermission = Math.random() < 0.1; // 10% 的概率为无权限
+    const permissions = noPermission
+      ? []
+      : permissionGroups
+          .flatMap(group => group.children || [group])
+          .filter(() => Math.random() > 0.3)
+          .map(p => p.value);
 
     const createTime = new Date(
       Date.now() - Math.random() * 10000000000
@@ -79,6 +75,7 @@ const generateMockData = (): Permission[] => {
       id: i,
       roleName: `${roleType}${i}`,
       permissions,
+      noPermission,
       createTime,
       updateTime,
       status: statuses[Math.floor(Math.random() * statuses.length)],

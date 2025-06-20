@@ -1,35 +1,52 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import {
+  PaginationActions,
+  type PaginationActionEvent,
+} from '@/types/EventTypes';
 
-defineProps<{
+const props = defineProps<{
   total: number;
+  currentPage: number;
+  pageSize: number;
 }>();
 
 const emit = defineEmits<{
-  (e: 'size-change', size: number): void;
-  (e: 'current-change', page: number): void;
+  (e: 'action', event: PaginationActionEvent): void;
 }>();
 
-const pageSize = ref(10);
-const currentPage = ref(1);
+// 使用 props 中的分页状态，不再内部管理
 
+// 内部处理页面大小变化
 const handleSizeChange = (val: number) => {
-  pageSize.value = val;
-  currentPage.value = 1;
-  emit('size-change', val);
+  emit('action', {
+    type: PaginationActions.CHANGE,
+    payload: {
+      type: 'size-change',
+      pageSize: val,
+      currentPage: 1,
+    },
+  });
 };
 
+// 内部处理当前页变化
 const handleCurrentChange = (val: number) => {
-  currentPage.value = val;
-  emit('current-change', val);
+  emit('action', {
+    type: PaginationActions.CHANGE,
+    payload: {
+      type: 'current-change',
+      currentPage: val,
+      pageSize: props.pageSize,
+    },
+  });
 };
 </script>
 
 <template>
   <div class="custom" style="display: flex; justify-content: center">
     <el-pagination
-      v-model:page-size="pageSize"
-      v-model:current-page="currentPage"
+      :page-size="pageSize"
+      :current-page="currentPage"
       :pager-count="7"
       :page-sizes="[10, 20, 50, 100]"
       :background="true"
