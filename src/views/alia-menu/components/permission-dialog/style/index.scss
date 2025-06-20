@@ -1,0 +1,89 @@
+.dialog-footer {
+  display: flex;
+  justify-content: center;
+  gap: 120px;
+  padding-top: 0;
+  padding-bottom: 12px;
+}
+
+.dialog-button {
+  width: 120px;
+  height: 40px;
+}
+
+.permission-form-item {
+  :deep(.el-form-item__content) {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.permission-header {
+  margin-bottom: 5px;
+  text-align: left;
+
+  :deep(.el-checkbox) {
+    margin-left: 0;
+    font-weight: bold;
+  }
+}
+
+.permission-checkbox-group {
+  margin-top: 0;
+
+  .permission-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+
+    .children-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-left: 24px;
+    }
+  }
+}
+:deep(.el-button) {
+  --el-button-text-color: #fff;
+  --el-button-hover-text-color: #fff;
+  --el-button-active-text-color: #fff;
+  --el-button-active-bg-color: #dcdfe6;
+  --el-button-active-border-color: #dcdfe6;
+  color: #fff;
+}
+:deep(.el-checkbox__input.is-checked + .el-checkbox__label) {
+  color: #089ead;
+}
+
+:deep(.el-checkbox) {
+  --el-checkbox-input-border-color-hover: #089ead;
+  --el-checkbox-checked-bg-color: #089ead;
+  --el-checkbox-checked-input-border-color: #089ead;
+}
+.upload-dialog .el-dialog__header {
+  border-bottom: 1px solid #e8eaec;
+  background: #b9d3f0;
+}
+
+.dialog :deep .el-dialog__header.show-close {
+  margin-right: 0px;
+  background-color: #089ead;
+  padding-right: 0;
+  padding-top: 12px;
+  padding-bottom: 12;
+}
+.dialog :deep .el-dialog__title,
+.el-dialog__headerbtn .el-dialog__close {
+  color: #ffffff;
+}
+.dialog :deep .el-dialog__headerbtn {
+  .el-dialog__close {
+    color: #ffffff;
+    font-size: large;
+  }
+}
+.dialog :deep .custom-dialog {
+  padding: 0;
+}

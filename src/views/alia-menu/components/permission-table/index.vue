@@ -1,52 +1,4 @@
-<style lang="scss" scoped>
-.permissions-item {
-  display: inline-block;
-  text-align: center;
-  line-height: 1.5;
-}
-
-.permissions-content {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  text-align: center;
-  width: 100%;
-}
-
-:deep(.el-table) {
-  .el-table__header-wrapper {
-    th.el-table__cell {
-      background-color: #11d2c8 !important;
-      color: white;
-      font-weight: bold;
-    }
-  }
-}
-
-:deep(.el-button--primary.is-plain) {
-  --el-button-bg-color: transparent;
-  --el-button-border-color: #11d2c8;
-  --el-button-hover-bg-color: #409eff;
-  --el-button-hover-border-color: #409eff;
-  --el-button-active-bg-color: #409eff;
-  --el-button-active-border-color: #409eff;
-  color: #11d2c8;
-}
-
-:deep(.el-button--danger.is-plain) {
-  --el-button-bg-color: transparent;
-  --el-button-border-color: #f56c6c;
-  --el-button-hover-bg-color: #f56c6c;
-  --el-button-hover-border-color: #f56c6c;
-  --el-button-active-bg-color: #f56c6c;
-  --el-button-active-border-color: #f56c6c;
-  color: #f56c6c;
-}
-</style>
 <script lang="ts" setup>
-import { defineProps, defineEmits } from 'vue';
 import type { Permission } from '@/mock/permissions';
 
 const props = defineProps<{
@@ -75,7 +27,7 @@ const handleDelete = (row: Permission) => {
 const getGroupedPermissions = (permissions: string[]) => {
   const grouped: { [key: string]: string[] } = {};
 
-  permissions.forEach(perm => {
+  permissions.forEach((perm: string) => {
     for (const group of props.permissionGroups) {
       const child = group.children?.find((c: any) => c.value === perm);
       if (child) {
@@ -107,12 +59,7 @@ const getGroupedPermissions = (permissions: string[]) => {
         </template>
       </el-table-column>
       <el-table-column prop="roleName" label="角色名称" width="180" />
-      <el-table-column
-        prop="permissions"
-        style="margin: auto"
-        label="系统权限"
-        min-width="980"
-      >
+      <el-table-column prop="permissions" label="系统权限" min-width="980">
         <template #default="{ row }">
           <div class="permissions-content">
             <div
@@ -127,16 +74,6 @@ const getGroupedPermissions = (permissions: string[]) => {
           </div>
         </template>
       </el-table-column>
-
-      <!--          <el-table-column prop="status" label="状态" width="100">-->
-      <!--            <template #default="{ row }">-->
-      <!--              <el-tag :type="row.status === 'active' ? 'success' : 'info'">-->
-      <!--                {{ row.status === 'active' ? '启用' : '禁用' }}-->
-      <!--              </el-tag>-->
-      <!--            </template>-->
-      <!--          </el-table-column>-->
-      <!--          <el-table-column prop="createTime" label="创建时间" width="180" />-->
-      <!--          <el-table-column prop="updateTime" label="更新时间" width="180" />-->
 
       <el-table-column
         fixed="right"
@@ -162,3 +99,7 @@ const getGroupedPermissions = (permissions: string[]) => {
     </el-table>
   </el-main>
 </template>
+
+<style lang="scss" scoped>
+@import './style/index.scss';
+</style>

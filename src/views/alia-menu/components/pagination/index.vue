@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 
-const props = defineProps<{
+defineProps<{
   total: number;
 }>();
 
@@ -37,42 +37,11 @@ const handleCurrentChange = (val: number) => {
       :total="total"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
+      color="#089ead"
     />
   </div>
 </template>
 
 <style lang="scss" scoped>
-:deep(.el-pagination.is-background .el-pager li:not(.is-disabled).is-active) {
-  background-color: #11d2c8;
-}
-
-:deep(.el-pagination .el-select .el-input .el-input__inner:focus) {
-  border-color: #11d2c8;
-}
-
-:deep(.el-pagination .el-select .el-input .el-input__wrapper.is-focus) {
-  box-shadow: 0 0 0 1px #11d2c8 inset;
-}
-
-:deep(.el-pagination .el-select .el-input .el-input__inner:hover) {
-  border-color: #11d2c8;
-}
-
-:deep(.el-pagination .btn-prev:hover),
-:deep(.el-pagination .btn-next:hover) {
-  color: #11d2c8;
-}
-
-:deep(.el-pagination .el-pager li:hover) {
-  color: #11d2c8;
-}
-
-:deep(.el-pagination .el-pager li.is-active) {
-  color: #fff;
-  background-color: #11d2c8;
-}
-
-:deep(.el-pagination .el-select .el-input .el-input__wrapper:hover) {
-  box-shadow: 0 0 0 1px #11d2c8 inset;
-}
+@import './style/index.scss';
 </style>
